@@ -24,7 +24,7 @@
 <meta property="og:description" content="使用SSL中对数据进行加密传输一、概述在 Acl 的网络通信模块中，为了支持安全网络传输，引入了第三方 SSL 库，当前支持 OpenSSL, PolarSSL 及其升级版 MbedTLS，Acl 库中通过抽象与封装，大大简化了 SSL 的使用过程（现在开源的 SSL 库使用过程确实过于太复杂），以下是在 Acl 库中使用 SSL 的特点：    动态加载第三方SSL库： 为了不给非 SSL 用户">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2020-01-15T05:08:24.000Z">
-<meta property="article:modified_time" content="2023-02-19T02:39:37.535Z">
+<meta property="article:modified_time" content="2023-02-19T15:55:18.971Z">
 <meta property="article:author" content="zsxxsz">
 <meta property="article:tag" content="SSL编程">
 <meta name="twitter:card" content="summary_large_image">
@@ -248,7 +248,7 @@
         
         
         
-          132 分钟
+          135 分钟
         
       </span>
     
@@ -359,6 +359,11 @@
 <h4 id="2-4-1、服务端"><a href="#2-4-1、服务端" class="headerlink" title="2.4.1、服务端"></a>2.4.1、服务端</h4><p>Acl SSL 模块在服务端处理 SSL SNI 的方式是自动的，无需应用特殊处理，只需要使用者添加多个不同域名的证书即可，即多次调用下面方法加载多个域名证书（即调用基类 <code>acl::sslbase_conf</code> 中的方法）：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">/**</span><br><span class="hljs-comment"> * 添加一个服务端/客户端自己的证书，可以多次调用本方法加载多个证书</span><br><span class="hljs-comment"> * @param crt_file &#123;const char*&#125; 证书文件全路径，非空</span><br><span class="hljs-comment"> * @param key_file &#123;const char*&#125; 密钥文件全路径，非空</span><br><span class="hljs-comment"> * @param key_pass &#123;const char*&#125; 密钥文件的密码，没有密钥密码可写 NULL</span><br><span class="hljs-comment"> * @return &#123;bool&#125; 添加证书是否成功</span><br><span class="hljs-comment"> */</span><br><span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">bool</span> <span class="hljs-title">add_cert</span><span class="hljs-params">(<span class="hljs-type">const</span> <span class="hljs-type">char</span>* crt_file, <span class="hljs-type">const</span> <span class="hljs-type">char</span>* key_file,</span></span><br><span class="hljs-params"><span class="hljs-function">	<span class="hljs-type">const</span> <span class="hljs-type">char</span>* key_pass = <span class="hljs-literal">NULL</span>)</span></span>;<br></code></pre></td></tr></table></figure>
 <p>使用者每通过 <code>sslbase_conf::add_cert</code> 方法添加一个 SSL 证书，内部人自动解析该证书，并提取证书中记录主机 DNS 信息的扩展数据，并添加主机域名与证书的映射关系；启动运行后，当收到客户端带有 SNI 标识的 SSL 握手请求时，会根据主机域名自动去查找匹配相应的 SSL 证书，从而为该次 SSL 会话选择正确的 SSL 证书。</p>
+<h2 id="四、Acl-库编译集成第三方-SSL-方式"><a href="#四、Acl-库编译集成第三方-SSL-方式" class="headerlink" title="四、Acl 库编译集成第三方 SSL 方式"></a>四、Acl 库编译集成第三方 SSL 方式</h2><p>Acl 库在缺省情况下自动支持 SSL 通信功能并采用动态加载第三方 SSL（OpenSSL&#x2F;MbedTLS&#x2F;PolarSSL） 动态库的方式来集成 SSL 功能，查看 Makefile 文件或 VC 工程可以看到在编译 Acl 库时指定了 HAS_OPENSSL_DLL&#x2F;HAS_MBEDTLS_DLL&#x2F;HAS_POLARSSL_DLL 编译选项，这样在 openssl_conf.cpp 等与 SSL 相关的功能模块代码中会根据此编译选项动态加载 SSL 动态库；但有时，有的项目希望可以静态链接 SSL 动态库，则在编译 Acl 项目中就需要指定静态连接编译选项，即（下面以集成 OpenSSL 为例）：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$ </span><span class="language-bash"><span class="hljs-built_in">cd</span> acl; make OPENSSL_STATIC=<span class="hljs-built_in">yes</span></span><br></code></pre></td></tr></table></figure>
+<p>然后在应用程序自身的 Makefile 中指定 SSL 库，如下 ：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs Makefile"><span class="hljs-section">app:</span><br>        g++ -o app app.o -lacl_cpp -lprotocol -lacl -lcrypto -lssl -lz -lpthread<br></code></pre></td></tr></table></figure>
+
 
                 
               </div>
