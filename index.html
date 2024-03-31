@@ -243,6 +243,67 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h1 class="index-header">
         
+        <a href="/2024/03/30/openssl_io/" target="_self">
+          OpenSSL IO读写超时踩坑小记
+        </a>
+      </h1>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2024/03/30/openssl_io/" target="_self">
+        <div>
+          OpenSSL IO读写超时踩坑小记一、背景最近一个线上服务项目需要开启 SSL 功能，该项目使用了Acl库中的 SSL、HTTP及协程模块、，Acl SSL 模块封装了OpenSSL库，使用户编写 SSL 服务更加简便快捷。当该服务程序开启 SSL 功能后，发现有 TCP 连接句柄较长时间堵在 IO 读上，所设置的 SSL IO 读写超时失去作用，造成的后果是服务程序内存不断增长。因为在线连接比
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2024-03-30 16:08" pubdate>
+              2024-03-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/SSL%E7%BC%96%E7%A8%8B/" class="category-chain-item">SSL编程</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/SSL%E7%BC%96%E7%A8%8B/">#SSL编程</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h1 class="index-header">
+        
         <a href="/2023/06/10/using_master/" target="_self">
           使用 acl_master 管理你的服务器程序
         </a>
@@ -760,67 +821,6 @@
 
           </div>
         
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h1 class="index-header">
-        
-        <a href="/2016/07/06/fiber_web/" target="_self">
-          使用协程方式编写高并发的WEB服务
-        </a>
-      </h1>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2016/07/06/fiber_web/" target="_self">
-        <div>
-          在《使用 acl 协程编写高并发网络服务》中介绍了一个使用 acl 协程库编写高并发网络服务的应用示例，本节将展示一个稍微复杂些且更具实际意义的例子：基于协程的 WEB 服务器程序。下面首先展示这个 WEB 服务器程序： 12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2016-07-06 21:01" pubdate>
-              2016-07-06
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%8D%8F%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="category-chain-item">协程编程</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%8D%8F%E7%A8%8B%E7%BC%96%E7%A8%8B/">#协程编程</a>
-            
-          </div>
         
       </div>
     </article>
