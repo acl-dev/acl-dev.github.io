@@ -24,7 +24,7 @@
 <meta property="og:description" content="使用 SSL SNI 拦截 SSL 握手攻击一、概述SSL&#x2F;TLS是用于在网络上进行安全通信的加密协议，各网络公司为保证数据传输的安全性均采用了SSL&#x2F;TLS通信方式，相校于明文传输方式，SSL&#x2F;TLS对于计算成本要求更高，尤其是在SSL&#x2F;TLS握手阶段更是耗费了大量计算资源，攻击者可以轻易利用这一问题对服务端发起SSL&#x2F;TLS握手攻击，攻击者只需">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-06-02T13:34:00.000Z">
-<meta property="article:modified_time" content="2024-06-10T08:39:57.391Z">
+<meta property="article:modified_time" content="2024-06-10T08:43:01.794Z">
 <meta property="article:author" content="zsxxsz">
 <meta property="article:tag" content="SSL编程">
 <meta name="twitter:card" content="summary_large_image">
@@ -237,7 +237,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          3.5k 字
+          3.6k 字
         
       </span>
     
@@ -248,7 +248,7 @@
         
         
         
-          30 分钟
+          31 分钟
         
       </span>
     
@@ -316,7 +316,7 @@
 </li>
 </ul>
 <p>通过SNI，多个SSL&#x2F;TLS站点可以在同一个服务器或同一个IP地址上共存，而且每一个站点都可以拥有自己独立的证书。这对于节省IP地址和简化服务器配置有重要意义。</p>
-<h2 id="三、实施案例"><a href="#三、实施案例" class="headerlink" title="三、实施案例"></a>三、实施案例</h2><p>Acl 库封装的 SSL 模块中提供了通过 SSL SNI 验证客户端身份的能力，下面给出了操作过程：</p>
+<h2 id="三、实施案例"><a href="#三、实施案例" class="headerlink" title="三、实施案例"></a>三、实施案例</h2><p>Acl 库( <a target="_blank" rel="noopener" href="https://github.com/acl-dev/acl">https://github.com/acl-dev/acl</a> )封装的 SSL 模块中提供了通过 SSL SNI 验证客户端身份的能力，下面给出了操作过程：</p>
 <h3 id="3-1、SSL-服务端"><a href="#3-1、SSL-服务端" class="headerlink" title="3.1、SSL 服务端"></a>3.1、SSL 服务端</h3><h4 id="3-1-2、SSL服务端实现SSL-SNI校验类"><a href="#3-1-2、SSL服务端实现SSL-SNI校验类" class="headerlink" title="3.1.2、SSL服务端实现SSL SNI校验类"></a>3.1.2、SSL服务端实现SSL SNI校验类</h4><p>下面给出 Acl SSL 模块中 SSL SNI 验证基类声明：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">namespace</span> acl &#123;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ACL_CPP_API</span> ssl_sni_checker &#123;<br><span class="hljs-keyword">public</span>:<br>	<span class="hljs-built_in">ssl_sni_checker</span>() &#123;&#125;<br>	<span class="hljs-keyword">virtual</span> ~<span class="hljs-built_in">ssl_sni_checker</span>() &#123;&#125;<br><br>	<span class="hljs-comment">/**</span><br><span class="hljs-comment">	 * 虚方法用来检查输入的sni host是否合法，子类必须实现</span><br><span class="hljs-comment">	 * @param sni &#123;const char*&#125; 客户端传来的 sni 字段</span><br><span class="hljs-comment">	 * @param host &#123;acl::string&amp;&#125; 从 sni 中提取的 host 字段</span><br><span class="hljs-comment">	 * @return &#123;bool&#125; 检查是否合法</span><br><span class="hljs-comment">	 */</span><br>	<span class="hljs-function"><span class="hljs-keyword">virtual</span> <span class="hljs-type">bool</span> <span class="hljs-title">check</span><span class="hljs-params">(sslbase_io* io, <span class="hljs-type">const</span> <span class="hljs-type">char</span>* sni, string&amp; host)</span> </span>= <span class="hljs-number">0</span>;<br>&#125;;<br><br>&#125;<br></code></pre></td></tr></table></figure>
 <p>用户需要实现 SSL SNI 子类并完成其中的纯虚方法，在该方法完成对客户端身份的校验。下面给出简单示例：</p>
@@ -336,6 +336,7 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c++"><br><span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">ssl_handshake</span><span class="hljs-params">(acl::sslbase_conf&amp; conf, acl::socket_stream&amp; conn)</span> </span>&#123;<br>    acl::sslbase_io* ssl = conf.<span class="hljs-built_in">create</span>(<span class="hljs-literal">false</span>);<br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* sni = <span class="hljs-string">&quot;crypted_token|mytest.com&quot;</span>;   <span class="hljs-comment">// 期中的加密token将由服务端验证</span><br>    ssl-&gt;<span class="hljs-built_in">set_sni_host</span>(sni);  <span class="hljs-comment">// 设置 SNI 字段</span><br>    <span class="hljs-keyword">if</span> (conn.<span class="hljs-built_in">setup_hook</span>(ssl) == ssl) &#123;<br>        <span class="hljs-comment">// SSL 握手失败，销毁 SSL IO 对象。</span><br>        ssl-&gt;<span class="hljs-built_in">destroy</span>();<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h3 id="3-3、参考"><a href="#3-3、参考" class="headerlink" title="3.3、参考"></a>3.3、参考</h3><ul>
+<li>Acl 库下载: <a target="_blank" rel="noopener" href="https://github.com/acl-dev/acl/">https://github.com/acl-dev/acl/</a></li>
 <li>客户端示例：acl&#x2F;lib_acl_cpp&#x2F;samples&#x2F;ssl&#x2F;client</li>
 <li>服务端示例：acl&#x2F;lib_acl_cpp&#x2F;samples&#x2F;ssl&#x2F;server</li>
 <li>使用SSL中对数据进行加密传输：<a href="https://acl-dev.cn/2020/01/15/ssl/">https://acl-dev.cn/2020/01/15/ssl/</a></li>
