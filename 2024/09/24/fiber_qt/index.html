@@ -1,0 +1,765 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="zsxxsz">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="一、概述人们在谈论协程编程时，往往与编写命令行网络程序有关，如编写网络客户端与网络服务器程序，很少涉及到客户端 UI 相关的界面编程。Acl 协程库是支持在 Windows 下的 UI 界面编程的，因为 Acl 协程的事件引擎支持了界面消息传递过程。最近学习了一下 QT UI 编程，轻松将 Acl 协程与 QT UI 集成在一起，从而实现了 QT 界面协程化，使开发人员在使用 QT 编写界面程序时">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在 QT 界面编程中使用协程">
+<meta property="og:url" content="https://acl-dev.cn/2024/09/24/fiber_qt/index.html">
+<meta property="og:site_name" content="Acl developer">
+<meta property="og:description" content="一、概述人们在谈论协程编程时，往往与编写命令行网络程序有关，如编写网络客户端与网络服务器程序，很少涉及到客户端 UI 相关的界面编程。Acl 协程库是支持在 Windows 下的 UI 界面编程的，因为 Acl 协程的事件引擎支持了界面消息传递过程。最近学习了一下 QT UI 编程，轻松将 Acl 协程与 QT UI 集成在一起，从而实现了 QT 界面协程化，使开发人员在使用 QT 编写界面程序时">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://acl-dev.cn/img/fiber_qt.jpg">
+<meta property="article:published_time" content="2024-09-24T13:01:24.000Z">
+<meta property="article:modified_time" content="2024-09-26T01:15:40.774Z">
+<meta property="article:author" content="zsxxsz">
+<meta property="article:tag" content="协程编程">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://acl-dev.cn/img/fiber_qt.jpg">
+  
+  
+  
+  <title>在 QT 界面编程中使用协程 - Acl developer</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"acl-dev.cn","root":"/","version":"1.9.4","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"zykZv6I4JOYMU6dwI0ehhPRG-gzGzoHsz","app_key":"5Dqdb47Rc6ylIri6ZJGMpt0B","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Acl develop!</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="在 QT 界面编程中使用协程"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-09-24 21:01" pubdate>
+          2024年9月24日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          39 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">在 QT 界面编程中使用协程</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="一、概述"><a href="#一、概述" class="headerlink" title="一、概述"></a>一、概述</h1><p>人们在谈论协程编程时，往往与编写命令行网络程序有关，如编写网络客户端与网络服务器程序，很少涉及到客户端 UI 相关的界面编程。Acl 协程库是支持在 Windows 下的 UI 界面编程的，因为 Acl 协程的事件引擎支持了界面消息传递过程。最近学习了一下 QT UI 编程，轻松将 Acl 协程与 QT UI 集成在一起，从而实现了 QT 界面协程化，使开发人员在使用 QT 编写界面程序时，编写网络模块变得非常简单。</p>
+<p>本文结合 Acl 中 lib_fiber&#x2F;samples-gui&#x2F;QtFiber 示例，演示了如何将 Acl 协程功能集成到 QT 界面中，实现了网络模块与界面模块的融合。</p>
+<h1 id="二、集成"><a href="#二、集成" class="headerlink" title="二、集成"></a>二、集成</h1><h2 id="2-1、编译-Acl"><a href="#2-1、编译-Acl" class="headerlink" title="2.1、编译 Acl"></a>2.1、编译 Acl</h2><p>目前 QT IDE 还无法直接使用 Acl 里的 CMakeLists.txt 文件编译 ACL，可以借助于 VC2019 打开 Acl 里的 acl_cpp_vc2019.sln 工程编译 Acl 五个库的动态库，分别为：lib_acl.dll, lib_protocol.dll, lib_acl_cpp.dll, libfiber.dll, libfiber_cpp.dll 及静态导出库：lib_acl.lib, lib_protocol.lib lib_acl_cpp.lib, libfiber.lib, libfiber_cpp.lib。</p>
+<h2 id="2-2、将-Acl-库集成到-QT-项目中"><a href="#2-2、将-Acl-库集成到-QT-项目中" class="headerlink" title="2.2、将 Acl 库集成到 QT 项目中"></a>2.2、将 Acl 库集成到 QT 项目中</h2><p>参考 lib_fiber&#x2F;samples-gui&#x2F;QtFiber&#x2F;CMakeLists.txt 文件，将 Acl 库的头文件包含进去，如下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs txt">set(acl_path ../../..)<br><br>include_directories(<br>    $&#123;acl_path&#125;/lib_acl/include<br>    $&#123;acl_path&#125;/lib_acl_cpp/include<br>    $&#123;acl_path&#125;/lib_fiber/c/include<br>    $&#123;acl_path&#125;/lib_fiber/cpp/include<br>)<br></code></pre></td></tr></table></figure>
+
+<p>然后设定编译条件：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs txt">add_definitions(&quot;-DACL_DLL&quot;<br>    &quot;-DACL_CPP_DLL&quot;<br>    &quot;-DHTTP_DLL&quot;<br>    &quot;-DICMP_DLL&quot;<br>    &quot;-DSMTP_DLL&quot;<br>    &quot;-DFIBER_CPP_DLL&quot;<br>    &quot;-D_CRT_SECURE_NO_WARNINGS&quot;<br>    &quot;-D_WINSOCK_DEPRECATED_NO_WARNINGS&quot;<br>)<br></code></pre></td></tr></table></figure>
+
+<p>添加库到工程中，如下：</p>
+<figure class="highlight txt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs txt">if (CMAKE_BUILD_TYPE STREQUAL &quot;RELEASE&quot;)<br>    set(acl_libs_path $&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/../../../x64/ReleaseDll)<br>else()<br>    set(acl_libs_path $&#123;CMAKE_CURRENT_SOURCE_DIR&#125;/../../../x64/DebugDll)<br>endif()<br><br>set(lib_all $&#123;acl_libs_path&#125;/libfiber_cpp.lib<br>    $&#123;acl_libs_path&#125;/lib_acl_cpp.lib<br>    $&#123;acl_libs_path&#125;/lib_protocol.lib<br>    $&#123;acl_libs_path&#125;/lib_acl.lib<br>    $&#123;acl_libs_path&#125;/libfiber.lib)<br><br>target_link_libraries(QtFiber PRIVATE Qt5::Widgets $&#123;lib_all&#125; Ws2_32)<br><br>add_custom_command(TARGET $&#123;PROJECT_NAME&#125; POST_BUILD<br>    COMMAND $&#123;CMAKE_COMMAND&#125; -E copy_if_different<br>        &quot;$&#123;acl_libs_path&#125;/libfiber_cpp.dll&quot;<br>        &quot;$&#123;acl_libs_path&#125;/libfiber.dll&quot;<br>        &quot;$&#123;acl_libs_path&#125;/lib_acl_cpp.dll&quot;<br>        &quot;$&#123;acl_libs_path&#125;/lib_acl.dll&quot;<br>        &quot;$&#123;acl_libs_path&#125;/lib_protocol.dll&quot;<br>        $&lt;TARGET_FILE_DIR:$&#123;PROJECT_NAME&#125;&gt;<br>)<br></code></pre></td></tr></table></figure>
+
+<h2 id="2-3、开始编写代码"><a href="#2-3、开始编写代码" class="headerlink" title="2.3、开始编写代码"></a>2.3、开始编写代码</h2><p>经过摸索研究，想要集成 Acl 协程到 QT UI 程序中，需要采用以下方法（主要是协程的初始化及退出）：</p>
+<h3 id="2-3-1、QT-程序初始化时初始化-Acl-协程"><a href="#2-3-1、QT-程序初始化时初始化-Acl-协程" class="headerlink" title="2.3.1、QT 程序初始化时初始化 Acl 协程"></a>2.3.1、QT 程序初始化时初始化 Acl 协程</h3><p>在调用 QT APP exec() 前，需要先调用 Acl 协程初始化过程，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">static</span> <span class="hljs-type">void</span> <span class="hljs-title">startupCallback</span><span class="hljs-params">()</span> </span>&#123;<br>    acl::fiber::<span class="hljs-built_in">schedule_gui</span>(); <span class="hljs-comment">// Won&#x27;t return until schedule finished.</span><br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-function">QApplication <span class="hljs-title">app</span><span class="hljs-params">(argc, argv)</span></span>;<br><br>    MainWindow w;<br>    w.<span class="hljs-built_in">show</span>();<br><br>    QTimer::<span class="hljs-built_in">singleShot</span>(<span class="hljs-number">0</span>, startupCallback);<br><br>    app.<span class="hljs-built_in">exec</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>可以看出，在调用 app.exec() 前注入了启动函数 startupCallback()，在里面启动了 acl 在界面模式下的协程调度过程 acl::fiber::schedule_gui()，该方法将进入界面消息循环过程，直到协程调度停止后才会返回。</p>
+<h3 id="2-3-2、在界面中创建协程"><a href="#2-3-2、在界面中创建协程" class="headerlink" title="2.3.2、在界面中创建协程"></a>2.3.2、在界面中创建协程</h3><p>一旦协程调度器启动，就可以创建并运行协程了，可以在主界面上添加一个按钮，当点击该按钮后的处理函数中便可以创建并启动一个协程。比如在例子中，点击 “Start fiber server” 按钮，在处理函数 <code> MainWindow::onStartServer()</code> 中，可以创建一个网络监听服务器，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MainWindow::onStartServer</span><span class="hljs-params">()</span> </span>&#123;<br>    ...<br>    server_ = <span class="hljs-keyword">new</span> <span class="hljs-built_in">fiber_server</span>(<span class="hljs-string">&quot;127.0.0.1&quot;</span>, <span class="hljs-number">9001</span>, <span class="hljs-keyword">this</span>);<br>    server_-&gt;<span class="hljs-built_in">start</span>();<br>    ...<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这样在界面里就创建了一个 TCP 监听协程，当有连接连接监听地址时，在监听协程里便可以创建一个客户端连接处理协程进行处理，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>    SOCKET conn = <span class="hljs-built_in">socket_accept</span>(sock);<br>    <span class="hljs-keyword">if</span> (conn == INVALID_SOCKET) &#123;<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    acl::fiber* fb = <span class="hljs-keyword">new</span> <span class="hljs-built_in">fiber_echo</span>(conn);<br>    fb-&gt;<span class="hljs-built_in">start</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>上面例子的客户端协程启动后，便可以进行网络 IO 读写，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">char</span> buf[<span class="hljs-number">8192</span>];<br><span class="hljs-keyword">while</span> (<span class="hljs-literal">true</span>) &#123;<br>    <span class="hljs-type">int</span> ret = <span class="hljs-built_in">acl_fiber_recv</span>(conn_, buf, <span class="hljs-built_in">sizeof</span>(buf) - <span class="hljs-number">1</span>, <span class="hljs-number">0</span>);<br>    <span class="hljs-keyword">if</span> (ret == <span class="hljs-number">-1</span>) &#123;<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br><br>    buf[ret] = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">acl_fiber_send</span>(conn_, buf, ret, <span class="hljs-number">0</span>) != ret) &#123;<br>        <span class="hljs-keyword">break</span>;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-3-3、界面程序退出前需要停止协程调度"><a href="#2-3-3、界面程序退出前需要停止协程调度" class="headerlink" title="2.3.3、界面程序退出前需要停止协程调度"></a>2.3.3、界面程序退出前需要停止协程调度</h3><p>必须保证在界面程序退出前停止协程调度器，否则界面程序无法正常退出，该步骤也非常重要。可以在主界面处理类里重载基类的 <code> void closeEvent(QCloseEvent *event);</code> 方法，在该方法里停止协程调度器，如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MainWindow::closeEvent</span><span class="hljs-params">(QCloseEvent *event)</span> </span>&#123;<br>    acl::fiber::<span class="hljs-built_in">schedule_stop</span>(); <span class="hljs-comment">// 停止协程调度器</span><br>    event-&gt;<span class="hljs-built_in">accept</span>();             <span class="hljs-comment">// 接受关闭事件</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-3-4、在界面线程中下载数据"><a href="#2-3-4、在界面线程中下载数据" class="headerlink" title="2.3.4、在界面线程中下载数据"></a>2.3.4、在界面线程中下载数据</h3><p>点击主界面中点击HTTP下载按钮，在事件处理函数中创建协程从后端HTTP服务器下载数据，过程如下：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MainWindow::onUrlGet</span><span class="hljs-params">()</span> </span>&#123;<br>    ...<br>    go[<span class="hljs-keyword">this</span>] &#123;<br>        <span class="hljs-type">const</span> <span class="hljs-type">char</span> *url = <span class="hljs-string">&quot;http://www.baidu.com/&quot;</span>;<br>        <span class="hljs-function">acl::http_request <span class="hljs-title">req</span><span class="hljs-params">(url)</span></span>;<br>        <span class="hljs-keyword">if</span> (!req.<span class="hljs-built_in">request</span>(<span class="hljs-literal">nullptr</span>, <span class="hljs-number">0</span>)) &#123;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Send HTTP request failed\r\n&quot;</span>);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        acl::string body;<br>        <span class="hljs-keyword">if</span> (!req.<span class="hljs-built_in">get_body</span>(body)) &#123;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Get HTTP body error\r\n&quot;</span>);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        <span class="hljs-built_in">qDebug</span>() &lt;&lt; <span class="hljs-string">&quot;Got body:&quot;</span> &lt;&lt; body.<span class="hljs-built_in">c_str</span>();<br>        ...<br>    &#125;;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="2-3-5、在协程中延迟创建容器"><a href="#2-3-5、在协程中延迟创建容器" class="headerlink" title="2.3.5、在协程中延迟创建容器"></a>2.3.5、在协程中延迟创建容器</h3><p>如果想某个容器延迟创建，不必借助定时器，直接在协程中就可以轻松实现：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MainWindow::delayCreate</span><span class="hljs-params">()</span> </span>&#123;<br>    go[<span class="hljs-keyword">this</span>] &#123;<br>        acl::fiber::<span class="hljs-built_in">delay</span>(<span class="hljs-number">5000</span>); <span class="hljs-comment">// 休眠 5 秒</span><br>        <span class="hljs-function">InputDialog <span class="hljs-title">dialog</span><span class="hljs-params">(<span class="hljs-keyword">this</span>)</span></span>;<br>        dialog.<span class="hljs-built_in">exec</span>();<br>    &#125;;<br>    <span class="hljs-built_in">qDebug</span>() &lt;&lt; <span class="hljs-string">&quot;Fiber was created to create one window after a while&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="2-4、效果展示"><a href="#2-4、效果展示" class="headerlink" title="2.4、效果展示"></a>2.4、效果展示</h2><p>编译运行 acl&#x2F;lib_fiber&#x2F;samples-gui&#x2F;QtFiber&#x2F; 工程，可以得到以下运行界面：<br><img src="/img/fiber_qt.jpg" srcset="/img/loading.gif" lazyload alt="fiber_qt"></p>
+<ul>
+<li>在前面窗口中，右边请求HTTP服务器时的HTTP请求头，右连接为后端服务器返回的HTTP响应头，该下载过程中在协程中进行，运行结果显示在主界面上；</li>
+<li>窗口下方的进度条为客户端协程与服务端协程交互时的交互进度展示。</li>
+</ul>
+<h2 id="2-5、小结"><a href="#2-5、小结" class="headerlink" title="2.5、小结"></a>2.5、小结</h2><p>以上便是如何编译集成 Acl 协程到 QT 界面程序的方法，主要的要点是：</p>
+<ul>
+<li>需要使用 vc2019 编译 Acl 的动态库，并集成至 QT 界面程序的工程文件中；</li>
+<li>编程时需要注意两点：<ul>
+<li>在启动 QT （即调用 app.exec()）前，需要先启动 Acl 协程调度器；</li>
+<li>在主界面类里需要重载基类关闭虚方法 <code>closeEvent()</code>，并在该方法里停止 Acl 协程调度器。</li>
+</ul>
+</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%8D%8F%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="category-chain-item">协程编程</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%8D%8F%E7%A8%8B%E7%BC%96%E7%A8%8B/">#协程编程</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>在 QT 界面编程中使用协程</div>
+      <div>https://acl-dev.cn/2024/09/24/fiber_qt/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>zsxxsz</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年9月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/06/02/ssl_sni/" title="使用 SSL SNI 拦截 SSL 握手攻击">
+                        <span class="hidden-mobile">使用 SSL SNI 拦截 SSL 握手攻击</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"zykZv6I4JOYMU6dwI0ehhPRG-gzGzoHsz","appKey":"5Dqdb47Rc6ylIri6ZJGMpt0B","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访问用户数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
