@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://acl-dev.cn/img/fiber_qt.jpg">
 <meta property="article:published_time" content="2024-09-24T13:01:24.000Z">
-<meta property="article:modified_time" content="2024-09-26T01:29:19.368Z">
+<meta property="article:modified_time" content="2024-09-26T02:13:09.084Z">
 <meta property="article:author" content="zsxxsz">
 <meta property="article:tag" content="协程编程">
 <meta name="twitter:card" content="summary_large_image">
@@ -324,7 +324,7 @@
 <h3 id="2-3-4、在界面线程中下载数据"><a href="#2-3-4、在界面线程中下载数据" class="headerlink" title="2.3.4、在界面线程中下载数据"></a>2.3.4、在界面线程中下载数据</h3><p>点击主界面中点击HTTP下载按钮，在事件处理函数中创建协程从后端HTTP服务器下载数据，过程如下：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MainWindow::onUrlGet</span><span class="hljs-params">()</span> </span>&#123;<br>    ...<br>    go[<span class="hljs-keyword">this</span>] &#123;<br>        <span class="hljs-type">const</span> <span class="hljs-type">char</span> *url = <span class="hljs-string">&quot;http://www.baidu.com/&quot;</span>;<br>        <span class="hljs-function">acl::http_request <span class="hljs-title">req</span><span class="hljs-params">(url)</span></span>;<br>        <span class="hljs-keyword">if</span> (!req.<span class="hljs-built_in">request</span>(<span class="hljs-literal">nullptr</span>, <span class="hljs-number">0</span>)) &#123;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Send HTTP request failed\r\n&quot;</span>);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        acl::string body;<br>        <span class="hljs-keyword">if</span> (!req.<span class="hljs-built_in">get_body</span>(body)) &#123;<br>            <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;Get HTTP body error\r\n&quot;</span>);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        <span class="hljs-built_in">qDebug</span>() &lt;&lt; <span class="hljs-string">&quot;Got body:&quot;</span> &lt;&lt; body.<span class="hljs-built_in">c_str</span>();<br>        ...<br>    &#125;;<br>&#125;<br></code></pre></td></tr></table></figure>
 
-<h3 id="2-3-5、在协程中延迟创建容器"><a href="#2-3-5、在协程中延迟创建容器" class="headerlink" title="2.3.5、在协程中延迟创建容器"></a>2.3.5、在协程中延迟创建容器</h3><p>如果想某个容器延迟创建，不必借助定时器，直接在协程中就可以轻松实现：</p>
+<h3 id="2-3-5、在协程中延迟创建容器"><a href="#2-3-5、在协程中延迟创建容器" class="headerlink" title="2.3.5、在协程中延迟创建容器"></a>2.3.5、在协程中延迟创建容器</h3><p>如果想某个窗口延迟创建，不必借助定时器，直接在协程中就可以轻松实现：</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">MainWindow::delayCreate</span><span class="hljs-params">()</span> </span>&#123;<br>    go[<span class="hljs-keyword">this</span>] &#123;<br>        acl::fiber::<span class="hljs-built_in">delay</span>(<span class="hljs-number">5000</span>); <span class="hljs-comment">// 休眠 5 秒</span><br>        <span class="hljs-function">InputDialog <span class="hljs-title">dialog</span><span class="hljs-params">(<span class="hljs-keyword">this</span>)</span></span>;<br>        dialog.<span class="hljs-built_in">exec</span>();<br>    &#125;;<br>    <span class="hljs-built_in">qDebug</span>() &lt;&lt; <span class="hljs-string">&quot;Fiber was created to create one window after a while&quot;</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
 <h2 id="2-4、效果展示"><a href="#2-4、效果展示" class="headerlink" title="2.4、效果展示"></a>2.4、效果展示</h2><p>编译运行 acl&#x2F;lib_fiber&#x2F;samples-gui&#x2F;QtFiber&#x2F; 工程，可以得到以下运行界面：<br><img src="/img/fiber_qt.jpg" srcset="/img/loading.gif" lazyload alt="fiber_qt"></p>
@@ -335,9 +335,10 @@
 <h2 id="2-5、小结"><a href="#2-5、小结" class="headerlink" title="2.5、小结"></a>2.5、小结</h2><p>以上便是如何编译集成 Acl 协程到 QT 界面程序的方法，主要的要点是：</p>
 <ul>
 <li>需要使用 vc2019 编译 Acl 的动态库，并集成至 QT 界面程序的工程文件中；</li>
-<li>编程时需要注意两点：<ul>
+<li>编程时需要注意：<ul>
 <li>在启动 QT （即调用 app.exec()）前，需要先启动 Acl 协程调度器；</li>
-<li>在主界面类里需要重载基类关闭虚方法 <code>closeEvent()</code>，并在该方法里停止 Acl 协程调度器。</li>
+<li>在主界面类里需要重载基类关闭虚方法 <code>closeEvent()</code>，并在该方法里停止 Acl 协程调度器；</li>
+<li>因为协程运行在界面的线程空间中，所以可以在协程中直接操作界面上的窗口对象，避免了线程之间的消息传递过程。</li>
 </ul>
 </li>
 </ul>
